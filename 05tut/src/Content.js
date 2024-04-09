@@ -21,7 +21,7 @@ const Content = () => {
 
   return (
     <div>
-      <p>Hello {handleNameChange()}</p>
+      <p onDoubleClick={handleClick}>Hello {handleNameChange()}</p>
       <button onClick={handleClick}>My first button!</button>
       <button onClick={() => handleClick2("Dave")}>My second button!</button>
       <button onClick={(e) => handleClick3(e)}>My third button!</button>
