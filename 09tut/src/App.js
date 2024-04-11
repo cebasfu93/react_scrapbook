@@ -16,7 +16,9 @@ function App() {
   const [search, setSearch] = useState(""); // state variable for the search input
 
   const setAndSaveItems = (newItems) => {
-    // function to update the items list and save it in cache
+    /**
+     * Update the items list and save it in cache
+     */
     // use the updated list to set the state
     setItems(newItems);
     // save the latest list in cache
@@ -24,7 +26,9 @@ function App() {
   };
 
   const addItem = (item) => {
-    // function to add a new item to the list
+    /**
+     * Add a new item to the list
+     */
     // compute the ID of the new item based on how many items there are in the items list
     const id = items.length ? items[items.length - 1].id + 1 : 1;
     const myNewItem = { id: id, checked: false, item: item }; // define the new item
@@ -33,7 +37,9 @@ function App() {
   };
 
   const handleCheck = (id) => {
-    // function to toggle the checked property of an item
+    /**
+     * Toggle the checked property of an item
+     */
     // something like a list comprehension.
     ///For every item in  the list, if the id matches the input, return the item with its checked property toggled.
     // Otherwise, return the item as is.
@@ -44,12 +50,17 @@ function App() {
   };
 
   const handleDelete = (id) => {
-    // function to delete an item from the list
+    /**
+     * Delete an item from the list
+     */
     const listItems = items.filter((item) => item.id !== id); // redo the list excluding the item with id `id`
     setAndSaveItems(listItems);
   };
 
   const handleSubmit = (e) => {
+    /**
+     * Handle the form submission. In this example, it adds a new item to the list
+     */
     e.preventDefault(); // prevent the default form submission, i.e., reloading the whole page
     if (!newItem) return; // if the input is empty, do nothing
     addItem(newItem); // add the new item to the list
@@ -57,6 +68,7 @@ function App() {
   };
 
   return (
+    // className is used to apply CSS classes to the elements
     <div className="App">
       <Header title="Groceries" />
       <AddItem

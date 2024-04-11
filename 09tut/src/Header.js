@@ -1,5 +1,8 @@
 // the Header component can take a prop called title
 const Header = ({ title }) => {
+  /**
+   * The header component. It just displays the title of the app.
+   */
   return (
     <header
       style={{
@@ -12,6 +15,7 @@ const Header = ({ title }) => {
   );
 };
 
+// set a default value for the props of Header
 Header.defaultProps = {
   title: "Default Title",
 };
