@@ -5,6 +5,7 @@ import Content from "./Content";
 import Footer from "./Footer";
 import Header from "./Header";
 import SearchItem from "./SearchItem";
+import apiRequest from "./apiRequest";
 
 function App() {
   const API_URL = "http://localhost:3500/items"; // URL of the server started with `npx json-server -p 3500 db.json`
@@ -17,11 +18,10 @@ function App() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await fetch(API_URL); // does a GET request to the server
+        const response = await fetch(API_URL); // does a request to the server
         // response.ok is equivalent to a response with status in the range 200-299
         if (!response.ok) throw Error("Did not receive expected data"); // if the response is not ok, throw an error
         const listItems = await response.json(); // parse the response as JSON
-        console.log(listItems);
         setItems(listItems); // set the items state variable to the list of items
         setFetchError(null); // clear the error state variable
       } catch (err) {
@@ -38,20 +38,30 @@ function App() {
     setTimeout(() => fetchItems(), 2000);
   }, []);
 
-  const addItem = (item) => {
+  const addItem = async (item) => {
     /**
-     * Add a new item to the list
+     * Add a new item to the list in the dashboard and in the store.
      */
     // compute the ID of the new item based on how many items there are in the items list
     const id = items.length ? items[items.length - 1].id + 1 : 1;
     const myNewItem = { id: id, checked: false, item: item }; // define the new item
     const listItems = [...items, myNewItem]; // unpack the current items and add the new item
     setItems(listItems);
+
+    const postOptions = {
+      method: "POST", // the of request to make
+      headers: {
+        "Content-Type": "application/json", // the type of data being sent
+      },
+      body: JSON.stringify(myNewItem), // the data to send
+    };
+    const result = await apiRequest(API_URL, postOptions); // make a POST request to the server
+    if (result) setFetchError(result); // if result is not null, then set the fetchError state variable to true (i.e, not null)
   };
 
-  const handleCheck = (id) => {
+  const handleCheck = async (id) => {
     /**
-     * Toggle the checked property of an item
+     * Toggle the checked property of an item in the dashboard and in the store.
      */
     // something like a list comprehension.
     ///For every item in  the list, if the id matches the input, return the item with its checked property toggled.
@@ -60,14 +70,33 @@ function App() {
       item.id === id ? { ...item, checked: !item.checked } : item
     );
     setItems(listItems);
+
+    const myItem = listItems.filter((item) => item.id === id); // get the id of the item that was toggled
+    const updateOptions = {
+      method: "PATCH", // requeste to update a specific entry
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ checked: myItem[0].checked }), // property to update in the object (the object to update is pointed by the URL)
+    };
+    // URL of the PATCH request pointing to the object to update
+    const reqUrl = `${API_URL}/${id}`;
+    const result = await apiRequest(reqUrl, updateOptions); // make a PATCH request to the server
+    if (result) setFetchError(result); // if result is not null, then set the fetchError state variable to true (i.e, not null)
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     /**
-     * Delete an item from the list
+     * Delete an item from the list and from the store.
      */
     const listItems = items.filter((item) => item.id !== id); // redo the list excluding the item with id `id`
     setItems(listItems);
+    const deleteOptions = {
+      method: "DELETE", // request to delete an entry
+    };
+    const reqUrl = `${API_URL}/${id}`; // URL indicating what entry to delete
+    const result = await apiRequest(reqUrl, deleteOptions); // make a DELETE request to the server
+    if (result) setFetchError(result); // if result is not null, then set the fetchError state variable to true (i.e, not null)
   };
 
   const handleSubmit = (e) => {
