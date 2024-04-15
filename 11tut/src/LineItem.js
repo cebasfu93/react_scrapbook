@@ -21,7 +21,7 @@ const LineItem = ({ item, handleCheck, handleDelete }) => {
           handleCheck(item.id);
         }}
       >
-        Item {item.id}
+        {item.item}
       </label>
       <FaTrashAlt
         onClick={() => handleDelete(item.id)}

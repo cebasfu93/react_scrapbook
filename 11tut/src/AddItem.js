@@ -9,7 +9,7 @@ const AddItem = ({ newItem, setNewItem, handleSubmit }) => {
   // Nothing happens here (similar to useState)
   // This is called a hook
   const inputRef = useRef();
-  console.log(inputRef, document.getElementById("addItem"));
+  // console.log(inputRef, document.getElementById("addItem"));  # return the HTML element
   return (
     // className is used to apply CSS classes to the elements
     // onSubmit is a function that is called when the form is submitted,

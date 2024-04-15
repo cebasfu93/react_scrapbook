@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddItem from "./AddItem";
 import "./App.css";
 import Content from "./Content";
@@ -15,15 +15,10 @@ function App() {
   const [newItem, setNewItem] = useState(""); // state variable for the new item to be added
   const [search, setSearch] = useState(""); // state variable for the search input
 
-  const setAndSaveItems = (newItems) => {
-    /**
-     * Update the items list and save it in cache
-     */
-    // use the updated list to set the state
-    setItems(newItems);
-    // save the latest list in cache
-    localStorage.setItem("shoppinglist", JSON.stringify(newItems));
-  };
+  useEffect(() => {
+    // the code inside this block will be run on every render
+    localStorage.setItem("shoppinglist", JSON.stringify(items)); // save the items list to the cache
+  }, [items]);
 
   const addItem = (item) => {
     /**
@@ -33,7 +28,7 @@ function App() {
     const id = items.length ? items[items.length - 1].id + 1 : 1;
     const myNewItem = { id: id, checked: false, item: item }; // define the new item
     const listItems = [...items, myNewItem]; // unpack the current items and add the new item
-    setAndSaveItems(listItems);
+    setItems(listItems);
   };
 
   const handleCheck = (id) => {
@@ -46,7 +41,7 @@ function App() {
     const listItems = items.map((item) =>
       item.id === id ? { ...item, checked: !item.checked } : item
     );
-    setAndSaveItems(listItems);
+    setItems(listItems);
   };
 
   const handleDelete = (id) => {
@@ -54,7 +49,7 @@ function App() {
      * Delete an item from the list
      */
     const listItems = items.filter((item) => item.id !== id); // redo the list excluding the item with id `id`
-    setAndSaveItems(listItems);
+    setItems(listItems);
   };
 
   const handleSubmit = (e) => {
