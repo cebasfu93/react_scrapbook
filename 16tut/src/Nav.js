@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 
 const Nav = ({ search, setSearch }) => {
+  /**
+   * Navigation menu of the blog.
+   */
   return (
     <nav className="Nav">
       <form className="searchForm" onSubmit={(e) => e.preventDefault()}>

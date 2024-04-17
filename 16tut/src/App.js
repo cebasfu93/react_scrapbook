@@ -9,12 +9,15 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import Layout from "./Layout";
 // react hooks
 import { useEffect, useState } from "react";
-// other dependencies
+// date functions
 import { format } from "date-fns";
 
 function App() {
-  const [search, setSearch] = useState("");
+  /**
+   * // Blog app with React Router.
+   */
   const [posts, setPosts] = useState([
+    // the starting posts
     {
       id: 1,
       title: "My First Post",
@@ -40,38 +43,56 @@ function App() {
       body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis consequatur expedita, assumenda similique non optio! Modi nesciunt excepturi corrupti atque blanditiis quo nobis, non optio quae possimus illum exercitationem ipsa!",
     },
   ]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [postTitle, setPostTitle] = useState("");
-  const [postBody, setPostBody] = useState("");
+  const [search, setSearch] = useState(""); // state variable to keep track of the text in the search bar
+  const [searchResults, setSearchResults] = useState([]); // state variable to keep track of the search results
+  const [postTitle, setPostTitle] = useState(""); // state variable to keep track of the title of a new post
+  const [postBody, setPostBody] = useState(""); // state variable to keep track of the body of a new post
   const navigate = useNavigate();
 
+  // hook to filter posts whenever the posts or the search bar changes
   useEffect(() => {
+    // keep posts with any matching text in the title or body
     const filteredResults = posts.filter(
       (post) =>
         post.body.toLowerCase().includes(search.toLowerCase()) ||
         post.title.toLowerCase().includes(search.toLowerCase())
     );
+    // set the search results to the filtered results.
+    // reverse to get the most recent posts first
     setSearchResults(filteredResults.reverse());
   }, [posts, search]);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const id = posts.length ? posts.length + 1 : 1;
-    const datetime = format(new Date(), "MMMM dd, yyyy pp");
+    /**
+     * Function to submit a new blog post to the app.
+     */
+    e.preventDefault(); // prevent the default form submission, i.e., reloading the page
+    const id = posts.length ? posts.length + 1 : 1; // generate a new id or use 1 if there are no posts
+    const datetime = format(new Date(), "MMMM dd, yyyy pp"); // format the current date and time
     const newPost = {
+      // define a new post based on the form inputs (which have been stored in state variables)
       id: id,
       title: postTitle,
       body: postBody,
       datetime: datetime,
     };
-    const allPosts = [...posts, newPost];
+    const allPosts = [...posts, newPost]; // redefine the posts array with the new post
+    // update the posts
     setPosts(allPosts);
+    // reset form fields
     setPostTitle("");
     setPostBody("");
+    // navigate to the home page
     navigate("/");
   };
+
   const handleDelete = (id) => {
+    /**
+     * Function to delete a blog post from the app.
+     */
+    // filter out the post with the given id
     const postsList = posts.filter((post) => post.id !== id);
+    // update the posts and navigate to the home page
     setPosts(postsList);
     navigate("/");
   };

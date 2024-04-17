@@ -5,6 +5,9 @@ const NewPost = ({
   postBody,
   setPostBody,
 }) => {
+  /**
+   * Component to create a new post.
+   */
   return (
     <main className="NewPost">
       <form className="newPostForm" onSubmit={handleSubmit}>

@@ -1,4 +1,7 @@
 const About = () => {
+  /**
+   * Component to display in the About route.
+   */
   return (
     <main className="About">
       <h2>About</h2>

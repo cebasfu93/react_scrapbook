@@ -1,5 +1,9 @@
+// import Link to set links in this component to other routes/pages/URLs
 import { Link } from "react-router-dom";
 const Missing = () => {
+  /**
+   * Component to display when a page is not found.
+   */
   return (
     <main className="Missing">
       <h2>Page Not Found</h2>
