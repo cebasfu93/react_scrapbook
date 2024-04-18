@@ -1,8 +1,12 @@
+import { useContext } from "react";
 import Feed from "./Feed";
-const Home = ({ posts, fetchError, isLoading }) => {
+import DataContext from "./context/DataContext";
+
+const Home = () => {
   /**
    * Home component to display a list of blog posts as previews. The heavy lifting is done by the Feed component.
    */
+  const { searchResults, fetchError, isLoading } = useContext(DataContext);
   return (
     // if there are posts, then display the Feed component, otherwise display a message.
     <main className="Home">
@@ -14,8 +18,8 @@ const Home = ({ posts, fetchError, isLoading }) => {
       )}
       {!isLoading &&
         !fetchError &&
-        (posts.length ? (
-          <Feed posts={posts} />
+        (searchResults.length ? (
+          <Feed posts={searchResults} />
         ) : (
           <p className="statusMsg">No posts to display</p>
         ))}
