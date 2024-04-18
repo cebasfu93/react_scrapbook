@@ -1,5 +1,6 @@
 // displayed depending on user interaction
 import About from "./About";
+import EditPost from "./EditPost";
 import Home from "./Home";
 import Missing from "./Missing"; // 404 page
 import NewPost from "./NewPost";
@@ -11,43 +12,42 @@ import Layout from "./Layout";
 import { useEffect, useState } from "react";
 // date functions
 import { format } from "date-fns";
+// import api
+import api from "./api/posts";
 
 function App() {
   /**
    * // Blog app with React Router.
    */
-  const [posts, setPosts] = useState([
-    // the starting posts
-    {
-      id: 1,
-      title: "My First Post",
-      datetime: "July 01, 2021 11:17:36 AM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis consequatur expedita, assumenda similique non optio! Modi nesciunt excepturi corrupti atque blanditiis quo nobis, non optio quae possimus illum exercitationem ipsa!",
-    },
-    {
-      id: 2,
-      title: "My 2nd Post",
-      datetime: "July 01, 2021 11:17:36 AM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis consequatur expedita, assumenda similique non optio! Modi nesciunt excepturi corrupti atque blanditiis quo nobis, non optio quae possimus illum exercitationem ipsa!",
-    },
-    {
-      id: 3,
-      title: "My 3rd Post",
-      datetime: "July 01, 2021 11:17:36 AM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis consequatur expedita, assumenda similique non optio! Modi nesciunt excepturi corrupti atque blanditiis quo nobis, non optio quae possimus illum exercitationem ipsa!",
-    },
-    {
-      id: 4,
-      title: "My Fourth Post",
-      datetime: "July 01, 2021 11:17:36 AM",
-      body: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis consequatur expedita, assumenda similique non optio! Modi nesciunt excepturi corrupti atque blanditiis quo nobis, non optio quae possimus illum exercitationem ipsa!",
-    },
-  ]);
+  const [posts, setPosts] = useState([]);
   const [search, setSearch] = useState(""); // state variable to keep track of the text in the search bar
   const [searchResults, setSearchResults] = useState([]); // state variable to keep track of the search results
   const [postTitle, setPostTitle] = useState(""); // state variable to keep track of the title of a new post
   const [postBody, setPostBody] = useState(""); // state variable to keep track of the body of a new post
+  const [editTitle, setEditTitle] = useState(""); // state variable to keep track of the edited title of a post
+  const [editBody, setEditBody] = useState(""); // state variable to keep track of the edited body of a post
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        // fetch the data using axios
+        // axios raises an error if the response status is not in the range 200-299, so no need to check response.ok
+        const response = await api.get("/posts");
+        setPosts(response.data);
+      } catch (err) {
+        if (err.response) {
+          // response not in the 200 range
+          console.log(err.response.data);
+          console.log(err.response.status);
+          console.log(err.response.headers);
+        } else {
+          console.log(`Error: ${err.message}`);
+        }
+      }
+    };
+    fetchPosts();
+  }, []);
 
   // hook to filter posts whenever the posts or the search bar changes
   useEffect(() => {
@@ -62,7 +62,7 @@ function App() {
     setSearchResults(filteredResults.reverse());
   }, [posts, search]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     /**
      * Function to submit a new blog post to the app.
      */
@@ -76,25 +76,65 @@ function App() {
       body: postBody,
       datetime: datetime,
     };
-    const allPosts = [...posts, newPost]; // redefine the posts array with the new post
-    // update the posts
-    setPosts(allPosts);
-    // reset form fields
-    setPostTitle("");
-    setPostBody("");
-    // navigate to the home page
-    navigate("/");
+    try {
+      const response = await api.post("/posts", newPost);
+      const allPosts = [...posts, response.data]; // redefine the posts array with the new post (as posted by axios)
+      // update the posts
+      setPosts(allPosts);
+      // reset form fields
+      setPostTitle("");
+      setPostBody("");
+      // navigate to the home page
+      navigate("/");
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
   };
 
-  const handleDelete = (id) => {
+  const handleEdit = async (id) => {
+    /**
+     * Function to edit a blog post in the app.
+     */
+    const datetime = format(new Date(), "MMMM dd, yyyy pp"); // format the current date and time
+    const updatedPost = {
+      // define a new post based on the edited form inputs (which have been stored in state variables)
+      id: id,
+      title: editTitle,
+      body: editBody,
+      datetime: datetime,
+    };
+
+    try {
+      // override an entry in the server with the updated post
+      const response = await api.put(`/posts/${id}`, updatedPost);
+      // the updated post is in response.data
+      // update the posts with their original values except for the post with the given id, which is updated
+      setPosts(
+        posts.map((post) => (post.id === id ? { ...response.data } : post))
+      );
+      // reset editing fields
+      setEditTitle("");
+      setEditBody("");
+      navigate("/");
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
+  };
+
+  const handleDelete = async (id) => {
     /**
      * Function to delete a blog post from the app.
      */
-    // filter out the post with the given id
-    const postsList = posts.filter((post) => post.id !== id);
-    // update the posts and navigate to the home page
-    setPosts(postsList);
-    navigate("/");
+    try {
+      await api.delete(`/posts/${id}`);
+      // filter out the post with the given id
+      const postsList = posts.filter((post) => post.id !== id);
+      // update the posts and navigate to the home page
+      setPosts(postsList);
+      navigate("/");
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
   };
   return (
     <Routes>
@@ -116,7 +156,7 @@ function App() {
                 handleSubmit={handleSubmit}
                 postTitle={postTitle}
                 setPostTitle={setPostTitle}
-                postBody={setPostBody}
+                postBody={postBody}
                 setPostBody={setPostBody}
               />
             }
@@ -127,6 +167,24 @@ function App() {
             element={<PostPage posts={posts} handleDelete={handleDelete} />}
           />
         </Route>
+
+        <Route path="edit">
+          {/* the default content of the "/edit" page is an EditPost component */}
+          <Route
+            path=":id"
+            element={
+              <EditPost
+                posts={posts}
+                handleEdit={handleEdit}
+                editTitle={editTitle}
+                setEditTitle={setEditTitle}
+                editBody={editBody}
+                setEditBody={setEditBody}
+              />
+            }
+          />
+        </Route>
+
         {/* the default content of the "/about" page is an About component */}
         <Route path="about" element={<About />} />
         {/* all other URLs are routed to a Missing (404) component */}
