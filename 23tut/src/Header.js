@@ -1,25 +1,23 @@
-import { FaLaptop, FaMobileAlt, FaTabletAlt } from "react-icons/fa";
-import useWindowSize from "./hooks/useWindowSize";
-
+// the Header component can take a prop called title
 const Header = ({ title }) => {
   /**
-   * Header of the application.
-   * Displays the title of the app and an icon based on the width of the window.
+   * The header component. It just displays the title of the app.
    */
-  // access the width variable from the context
-  const { width } = useWindowSize(); // the hook returns an object with the window width and height. We keep only the width.
   return (
-    <header className="Header">
+    <header
+      style={{
+        backgroundColor: "mediumblue",
+        color: "#fff",
+      }}
+    >
       <h1>{title}</h1>
-      {width < 768 ? (
-        <FaMobileAlt />
-      ) : width < 992 ? (
-        <FaTabletAlt />
-      ) : (
-        <FaLaptop />
-      )}
     </header>
   );
+};
+
+// set a default value for the props of Header
+Header.defaultProps = {
+  title: "Default Title",
 };
 
 export default Header;

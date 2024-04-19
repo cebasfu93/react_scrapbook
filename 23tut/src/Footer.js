@@ -1,13 +1,13 @@
-import { useStoreState } from "easy-peasy";
-
-const Footer = () => {
+const Footer = ({ length }) => {
   /**
-   * Component to display in the footer of the app.
+   * Footer of the app. It displays the number of items in the list.
    */
-  const postCount = useStoreState((state) => state.postCount); // Get the number of posts in the store
   return (
-    <footer className="Footer">
-      <p>{postCount} Blog Posts</p>
+    <footer>
+      <p>
+        {length} List {length === 1 ? "Item" : "Items"}{" "}
+        {/* inline conditional to handle singular and plural */}
+      </p>
     </footer>
   );
 };
