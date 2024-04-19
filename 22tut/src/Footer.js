@@ -1,11 +1,13 @@
+import { useStoreState } from "easy-peasy";
+
 const Footer = () => {
   /**
    * Component to display in the footer of the app.
    */
-  const today = new Date(); // Get the current datetime
+  const postCount = useStoreState((state) => state.postCount); // Get the number of posts in the store
   return (
     <footer className="Footer">
-      <p>Copyright &copy; {today.getFullYear()}</p>
+      <p>{postCount} Blog Posts</p>
     </footer>
   );
 };

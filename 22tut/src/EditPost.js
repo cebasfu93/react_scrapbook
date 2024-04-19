@@ -1,16 +1,25 @@
 import { format } from "date-fns";
-import { useContext, useEffect, useState } from "react";
+import { useStoreActions, useStoreState } from "easy-peasy";
+import { useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import api from "./api/posts";
-import DataContext from "./context/DataContext";
 
 const EditPost = () => {
-  const navigate = useNavigate();
-  const { posts, setPosts } = useContext(DataContext);
-  const [editTitle, setEditTitle] = useState(""); // state variable to keep track of the edited title of a post
-  const [editBody, setEditBody] = useState(""); // state variable to keep track of the edited body of a post
+  /**
+   * Component to edit a blog post.
+   */
   const { id } = useParams();
-  const post = posts.find((post) => post.id.toString() === id);
+  const navigate = useNavigate();
+
+  const editTitle = useStoreState((state) => state.editTitle);
+  const editBody = useStoreState((state) => state.editBody);
+
+  const editPost = useStoreActions((actions) => actions.editPost);
+  const setEditTitle = useStoreActions((actions) => actions.setEditTitle);
+  const setEditBody = useStoreActions((actions) => actions.setEditBody);
+
+  const getPostById = useStoreState((state) => state.getPostById);
+  const post = getPostById(id);
+
   useEffect(() => {
     if (post) {
       setEditTitle(post.title);
@@ -18,7 +27,7 @@ const EditPost = () => {
     }
   }, [post, setEditTitle, setEditBody]);
 
-  const handleEdit = async (id) => {
+  const handleEdit = (id) => {
     /**
      * Function to edit a blog post in the app.
      */
@@ -30,22 +39,8 @@ const EditPost = () => {
       body: editBody,
       datetime: datetime,
     };
-
-    try {
-      // override an entry in the server with the updated post
-      const response = await api.put(`/posts/${id}`, updatedPost);
-      // the updated post is in response.data
-      // update the posts with their original values except for the post with the given id, which is updated
-      setPosts(
-        posts.map((post) => (post.id === id ? { ...response.data } : post))
-      );
-      // reset editing fields
-      setEditTitle("");
-      setEditBody("");
-      navigate("/");
-    } catch (err) {
-      console.log(`Error: ${err.message}`);
-    }
+    editPost(updatedPost);
+    navigate(`/post/${id}`);
   };
 
   return (
@@ -69,7 +64,7 @@ const EditPost = () => {
               value={editBody}
               onChange={(e) => setEditBody(e.target.value)}
             />
-            <button type="submit" onClick={() => handleEdit(post.id)}>
+            <button type="button" onClick={() => handleEdit(post.id)}>
               Submit
             </button>
           </form>

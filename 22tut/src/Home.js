@@ -1,12 +1,11 @@
-import { useContext } from "react";
+import { useStoreState } from "easy-peasy";
 import Feed from "./Feed";
-import DataContext from "./context/DataContext";
 
-const Home = () => {
+const Home = ({ isLoading, fetchError }) => {
   /**
    * Home component to display a list of blog posts as previews. The heavy lifting is done by the Feed component.
    */
-  const { searchResults, fetchError, isLoading } = useContext(DataContext);
+  const searchResults = useStoreState((state) => state.searchResults);
   return (
     // if there are posts, then display the Feed component, otherwise display a message.
     <main className="Home">

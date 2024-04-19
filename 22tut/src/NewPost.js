@@ -1,19 +1,21 @@
 import { format } from "date-fns";
-import { useContext, useState } from "react";
+import { useStoreActions, useStoreState } from "easy-peasy";
 import { useNavigate } from "react-router-dom";
-import api from "./api/posts";
-import DataContext from "./context/DataContext";
 
 const NewPost = () => {
   /**
    * Component to create a new post.
    */
   const navigate = useNavigate();
-  const { posts, setPosts } = useContext(DataContext);
-  const [postTitle, setPostTitle] = useState(""); // state variable to keep track of the title of a new post
-  const [postBody, setPostBody] = useState(""); // state variable to keep track of the body of a new post
 
-  const handleSubmit = async (e) => {
+  const posts = useStoreState((state) => state.posts);
+  const postTitle = useStoreState((state) => state.postTitle);
+  const postBody = useStoreState((state) => state.postBody);
+  const savePost = useStoreActions((actions) => actions.savePost);
+  const setPostTitle = useStoreActions((actions) => actions.setPostTitle);
+  const setPostBody = useStoreActions((actions) => actions.setPostBody);
+
+  const handleSubmit = (e) => {
     /**
      * Function to submit a new blog post to the app.
      */
@@ -27,19 +29,9 @@ const NewPost = () => {
       body: postBody,
       datetime: datetime,
     };
-    try {
-      const response = await api.post("/posts", newPost);
-      const allPosts = [...posts, response.data]; // redefine the posts array with the new post (as posted by axios)
-      // update the posts
-      setPosts(allPosts);
-      // reset form fields
-      setPostTitle("");
-      setPostBody("");
-      // navigate to the home page
-      navigate("/");
-    } catch (err) {
-      console.log(`Error: ${err.message}`);
-    }
+    savePost(newPost); // save the new post to the store
+    // navigate to the home page
+    navigate("/");
   };
 
   return (

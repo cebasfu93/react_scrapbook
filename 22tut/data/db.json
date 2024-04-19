@@ -13,16 +13,10 @@
       "datetime": "April 18, 2024 4:08:14 PM"
     },
     {
-      "id": 3,
+      "id": "3",
       "title": "3rd post",
       "body": "adsads",
       "datetime": "April 18, 2024 4:08:22 PM"
-    },
-    {
-      "id": 4,
-      "title": "4th post",
-      "body": "haha",
-      "datetime": "April 18, 2024 4:08:41 PM"
     }
   ]
 }

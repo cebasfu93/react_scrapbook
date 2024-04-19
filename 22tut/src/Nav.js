@@ -1,12 +1,31 @@
-import { useContext } from "react";
+import { useStoreActions, useStoreState } from "easy-peasy";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import DataContext from "./context/DataContext";
 
 const Nav = () => {
   /**
    * Navigation menu of the blog.
    */
-  const { search, setSearch } = useContext(DataContext);
+  const posts = useStoreState((state) => state.posts);
+  const search = useStoreState((state) => state.search);
+  const setSearch = useStoreActions((actions) => actions.setSearch);
+  const setSearchResults = useStoreActions(
+    (actions) => actions.setSearchResults
+  );
+
+  // hook to filter posts whenever the posts or the search bar changes
+  useEffect(() => {
+    // keep posts with any matching text in the title or body
+    const filteredResults = posts.filter(
+      (post) =>
+        post.body.toLowerCase().includes(search.toLowerCase()) ||
+        post.title.toLowerCase().includes(search.toLowerCase())
+    );
+    // set the search results to the filtered results.
+    // reverse to get the most recent posts first
+    setSearchResults(filteredResults.reverse());
+  }, [posts, search, setSearchResults]);
+
   return (
     <nav className="Nav">
       <form className="searchForm" onSubmit={(e) => e.preventDefault()}>
